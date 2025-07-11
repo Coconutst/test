@@ -48,38 +48,37 @@ class DeepSeekAgent:
     
     def _create_prompt(self) -> PromptTemplate:
         """创建提示模板"""
-        template = """你是一个有用的AI助手，可以使用各种工具来帮助用户解决问题。
+        template = """你是一个强大的AI助手，严格按照以下格式进行响应。
 
-你有以下工具可以使用：
+**可用工具:**
 {tools}
 
-使用以下格式：
+**响应格式:**
+你必须严格遵循以下格式。在你的响应中，只能包含'Thought', 'Action', 'Action Input', 和 'Final Answer'。
 
-Question: 用户的问题
-Thought: 你应该思考要做什么
-Action: 要采取的行动，应该是[{tool_names}]中的一个
-Action Input: 行动的输入
-Observation: 行动的结果
-... (这个Thought/Action/Action Input/Observation可以重复N次)
-Thought: 我现在知道最终答案了
-Final Answer: 对原始问题的最终答案
+Question: 用户提出的原始问题
+Thought: 我需要做什么来回答这个问题？
+Action: 我应该使用哪个工具？必须是[{tool_names}]中的一个。
+Action Input: 这个工具需要什么输入？
+Observation: 工具执行后的结果是什么？
+... (这个 Thought/Action/Action Input/Observation 的序列可以重复N次) ...
+Thought: 我现在已经收集了足够的信息，可以回答用户的问题了。
+Final Answer: 对用户原始问题的最终回答。
 
-开始！
+**## 规则 ##**
+- **绝对不要** 在一次响应中同时包含 "Action" 和 "Final Answer"。这是禁止的。
+- 如果你需要使用工具，就使用 "Action"。
+- 只有当你**绝对**完成了所有必要步骤，并且准备好给出最终答案时，才使用 "Final Answer"。
 
-Previous conversation history:
+**对话历史:**
 {chat_history}
 
+**开始!**
+
 Question: {input}
-Thought: {agent_scratchpad}"""
+Thought:{agent_scratchpad}"""
         
-        return PromptTemplate(
-            template=template,
-            input_variables=["input", "chat_history", "agent_scratchpad"],
-            partial_variables={
-                "tools": "\n".join([f"{tool.name}: {tool.description}" for tool in self.tools]),
-                "tool_names": ", ".join([tool.name for tool in self.tools])
-            }
-        )
+        return PromptTemplate.from_template(template)
     
     def chat(self, message: str) -> str:
         """与智能体对话"""
