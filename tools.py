@@ -46,51 +46,134 @@ class Calculator(BaseTool):
             return f"计算错误: {str(e)}"
 
 
-# 真实的网络搜索工具
+# 使用EXA-AI的网络搜索工具
 class SearchInput(BaseModel):
     query: str = Field(description="搜索关键词")
+    num_results: Optional[int] = Field(default=5, description="返回结果数量")
 
 
 class WebSearch(BaseTool):
-    """真实的网络搜索工具"""
+    """基于EXA-AI的高级网络搜索工具"""
     name = "web_search"
-    description = "搜索互联网信息并返回真实结果"
+    description = "使用EXA-AI进行高质量的互联网搜索，返回实时准确的结果"
     args_schema = SearchInput
     
-    def _run(self, query: str) -> str:
+    def _run(self, query: str, num_results: int = 5) -> str:
         try:
-            # 使用真实的搜索API
+            # EXA-AI搜索配置
+            exa_api_url = "https://api.exa.ai/search"
+
+            # 从环境变量获取EXA API密钥，如果没有则使用内置搜索
+            exa_api_key = os.getenv('EXA_API_KEY')
+
+            if exa_api_key:
+                # 使用EXA-AI API
+                headers = {
+                    'Authorization': f'Bearer {exa_api_key}',
+                    'Content-Type': 'application/json'
+                }
+
+                payload = {
+                    'query': query,
+                    'num_results': min(num_results, 10),
+                    'include_text': ['text']
+                }
+
+                try:
+                    response = requests.post(exa_api_url,
+                                           headers=headers,
+                                           json=payload,
+                                           timeout=15)
+
+                    if response.status_code == 200:
+                        data = response.json()
+                        results = []
+
+                        for i, result in enumerate(data.get('results', [])[:num_results], 1):
+                            title = result.get('title', '无标题')
+                            url = result.get('url', '')
+                            text = result.get('text', '')[:200] + '...' if result.get('text') else '无内容摘要'
+
+                            results.append(f"{i}. {title}\n   {url}\n   摘要: {text}\n")
+
+                        if results:
+                            return f"🔍 EXA-AI搜索 '{query}' 的结果:\n\n" + "\n".join(results)
+                        else:
+                            return f"EXA-AI搜索 '{query}' 没有找到相关结果"
+
+                    elif response.status_code == 401:
+                        return "EXA-AI API认证失败，请检查API密钥配置"
+                    else:
+                        print(f"EXA-AI API响应详情: {response.text}")  # 添加调试信息
+                        return f"EXA-AI API调用失败，状态码: {response.status_code}"
+
+                except requests.exceptions.RequestException as e:
+                    # 如果EXA-AI调用失败，回退到备用搜索方式
+                    return self._fallback_search(query)
+
+            else:
+                # 如果没有EXA API密钥，使用备用搜索方式
+                return self._fallback_search(query)
+
+        except Exception as e:
+            return f"搜索过程中发生错误: {str(e)}"
+
+    def _fallback_search(self, query: str) -> str:
+        """备用搜索方法"""
+        try:
+            # 使用模拟的高质量搜索结果
             encoded_query = urllib.parse.quote(query)
-            
-            # 尝试多个搜索源
-            search_engines = [
-                f"https://api.duckduckgo.com/?q={encoded_query}&format=json&no_html=1",
-                f"https://www.bing.com/search?q={encoded_query}&format=rss"
-            ]
             
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
             }
             
-            for search_url in search_engines:
-                try:
-                    response = requests.get(search_url, headers=headers, timeout=10)
-                    if response.status_code == 200:
-                        if 'duckduckgo' in search_url:
-                            data = response.json()
-                            if data.get('AbstractText'):
-                                return f"搜索 '{query}' 的结果:\n{data['AbstractText']}\n来源: {data.get('AbstractSource', 'DuckDuckGo')}"
-                        else:
-                            # 简单解析HTML结果
-                            content = response.text[:1000]
-                            return f"搜索 '{query}' 完成\n找到相关信息，内容长度: {len(content)} 字符"
-                except:
-                    continue
-            
-            return f"搜索 '{query}' 完成，但由于网络限制无法获取详细结果"
-            
+            # 尝试DuckDuckGo即时答案API
+            try:
+                search_url = f"https://api.duckduckgo.com/?q={encoded_query}&format=json&no_html=1"
+                response = requests.get(search_url, headers=headers, timeout=10)
+
+                if response.status_code == 200:
+                    data = response.json()
+
+                    # 构建搜索结果
+                    results = []
+
+                    # 添加即时答案
+                    if data.get('AbstractText'):
+                        results.append(f"📊 即时答案: {data['AbstractText']}")
+                        if data.get('AbstractSource'):
+                            results.append(f"   来源: {data['AbstractSource']}")
+
+                    # 添加相关话题
+                    if data.get('RelatedTopics'):
+                        results.append("\n🔗 相关话题:")
+                        for i, topic in enumerate(data['RelatedTopics'][:3], 1):
+                            if isinstance(topic, dict) and topic.get('Text'):
+                                results.append(f"   {i}. {topic['Text'][:100]}...")
+
+                    # 添加定义
+                    if data.get('Definition'):
+                        results.append(f"\n📖 定义: {data['Definition']}")
+
+                    if results:
+                        return f"🔍 搜索 '{query}' 的结果:\n\n" + "\n".join(results)
+
+            except Exception:
+                pass
+
+            # 如果所有方法都失败，返回建议性回复
+            return f"""🔍 搜索 '{query}' 完成
+
+由于网络限制，无法获取实时搜索结果。建议您：
+1. 访问权威搜索引擎（Google、Bing、DuckDuckGo）
+2. 查看相关领域的官方网站或文档
+3. 咨询专业数据库或学术资源
+
+如需更准确的搜索功能，请配置EXA-AI API密钥。"""
+
         except Exception as e:
-            return f"搜索失败: {str(e)}"
+            return f"备用搜索失败: {str(e)}"
 
 
 # 真实的文件操作工具

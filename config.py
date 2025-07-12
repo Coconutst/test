@@ -11,6 +11,10 @@ class Config:
     DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
     DEEPSEEK_BASE_URL = "https://api.deepseek.com/v1"
     
+    # EXA-AI API配置
+    EXA_API_KEY = os.getenv("EXA_API_KEY", "")
+    EXA_BASE_URL = "https://api.exa.ai"
+
     # 模型配置
     DEFAULT_MODEL = "deepseek-chat"
     MAX_TOKENS = 2000
@@ -25,4 +29,9 @@ class Config:
         """验证配置"""
         if not cls.DEEPSEEK_API_KEY:
             raise ValueError("DEEPSEEK_API_KEY 环境变量未设置")
+
+        # EXA API密钥是可选的，如果没有会使用备用搜索
+        if not cls.EXA_API_KEY:
+            print("⚠️ 注意: EXA_API_KEY 未设置，将使用备用搜索功能")
+
         return True
