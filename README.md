@@ -1,10 +1,10 @@
-# DeepSeek智能体
+# Gemini智能体
 
-基于LangChain和DeepSeek API构建的简单智能体，具备工具调用和对话记忆功能。
+基于LangChain和Google Gemini API构建的简单智能体，具备工具调用和对话记忆功能。
 
 ## 功能特性
 
-- 🤖 基于DeepSeek API的大语言模型
+- 🤖 基于Google Gemini API的大语言模型
 - 🔧 集成多种工具（计算器、搜索、文本分析）
 - 💭 对话记忆功能
 - 🎯 ReAct推理模式
@@ -45,10 +45,15 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-2. 编辑 `.env` 文件，填入您的DeepSeek API密钥：
+2. 编辑 `.env` 文件，填入您的Gemini API密钥：
 ```
-DEEPSEEK_API_KEY=your_actual_api_key_here
+GEMINI_API_KEY=your_actual_api_key_here
 ```
+
+获取Gemini API密钥：
+- 访问 [Google AI Studio](https://aistudio.google.com/app/apikey)
+- 创建新的API密钥
+- 复制密钥到 `.env` 文件中
 
 ## 使用方法
 
@@ -69,7 +74,7 @@ python main.py demo
 ```
 ├── agent.py           # 智能体核心实现
 ├── config.py          # 配置管理
-├── deepseek_client.py # DeepSeek API客户端
+├── gemini_client.py   # Gemini API客户端
 ├── tools.py           # 工具函数集合
 ├── main.py            # 主程序入口
 ├── requirements.txt   # 依赖列表
@@ -158,9 +163,15 @@ def get_tools():
 
 ## 注意事项
 
-1. 确保DeepSeek API密钥有效
+1. 确保Gemini API密钥有效
 2. 网络连接正常
 3. Python版本 >= 3.8
+
+## 支持的模型
+
+- `gemini-2.5-pro` (默认)
+- `gemini-2.5-flash`
+- `gemini-2.5-flash-preview-04-17`
 
 ## 故障排除
 
@@ -169,10 +180,11 @@ def get_tools():
 1. **API密钥错误**
    - 检查 `.env` 文件中的API密钥是否正确
    - 确认API密钥有效且有足够额度
+   - 访问 [Google AI Studio](https://aistudio.google.com/app/apikey) 检查密钥状态
 
 2. **网络连接问题**
    - 检查网络连接
-   - 确认可以访问DeepSeek API
+   - 确认可以访问Google AI服务
 
 3. **依赖安装问题**
    - 使用虚拟环境

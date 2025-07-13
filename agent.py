@@ -1,21 +1,21 @@
 from langchain.agents import AgentExecutor, create_react_agent
 from langchain.memory import ConversationBufferMemory
 from langchain.prompts import PromptTemplate
-from deepseek_client import DeepSeekLLM
+from gemini_client import GeminiLLM
 from tools import get_tools
 from config import Config
 
 
-class DeepSeekAgent:
-    """基于DeepSeek和LangChain的智能体"""
-    
+class GeminiAgent:
+    """基于Gemini和LangChain的智能体"""
+
     def __init__(self):
         """初始化智能体"""
         # 验证配置
         Config.validate()
-        
+
         # 初始化LLM
-        self.llm = DeepSeekLLM()
+        self.llm = GeminiLLM()
         
         # 获取工具
         self.tools = get_tools()

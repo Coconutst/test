@@ -1,24 +1,24 @@
 #!/usr/bin/env python3
 """
-DeepSeek智能体主程序
+Gemini智能体主程序
 """
 
 import sys
-from agent import DeepSeekAgent
+from agent import GeminiAgent
 from config import Config
 
 
 def main():
     """主函数"""
-    print("=== DeepSeek智能体 ===")
+    print("=== Gemini智能体 ===")
     print("输入 'quit' 或 'exit' 退出程序")
     print("输入 'reset' 重置对话历史")
     print("输入 'memory' 查看对话历史")
     print("-" * 50)
-    
+
     try:
         # 创建智能体
-        agent = DeepSeekAgent()
+        agent = GeminiAgent()
         print("智能体初始化成功！")
         
         # 交互循环
@@ -63,10 +63,10 @@ def main():
 
 def demo():
     """演示函数"""
-    print("=== DeepSeek智能体演示 ===")
-    
+    print("=== Gemini智能体演示 ===")
+
     try:
-        agent = DeepSeekAgent()
+        agent = GeminiAgent()
         
         # 演示对话
         demo_questions = [
