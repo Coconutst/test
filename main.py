@@ -51,6 +51,9 @@ def main():
             except KeyboardInterrupt:
                 print("\n\n程序被用户中断")
                 break
+            except EOFError:
+                print("\n\n程序结束")
+                break
             except Exception as e:
                 print(f"发生错误: {str(e)}")
                 continue

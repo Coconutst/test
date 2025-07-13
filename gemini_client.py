@@ -42,8 +42,10 @@ class GeminiLLM(LLM):
 
             # 简化初始化，避免网络调用
             try:
-                self.gemini_model = "initialized"  # 标记已初始化
-                print(f"✅ Gemini模型初始化成功: {self.model}")
+                # 验证模型名称格式
+                model_name = self.model if not self.model.startswith("models/") else self.model.replace("models/", "")
+                self.gemini_model = model_name  # 存储模型名称
+                print(f"✅ Gemini模型初始化成功: {model_name}")
 
             except Exception as e:
                 raise Exception(f"无法初始化Gemini模型: {str(e)}")
@@ -80,18 +82,24 @@ Final Answer: 抱歉，我目前在模拟模式下运行。要使用真实的Gem
 当前使用模型: {self.model}"""
 
         try:
-            # 尝试使用旧版API生成响应
-            model_name = f"models/{self.model}" if not self.model.startswith("models/") else self.model
-            response = genai.generate_text(
-                model=model_name,
-                prompt=prompt,
-                temperature=self.temperature,
-                max_output_tokens=self.max_tokens
+            # 使用新版API生成响应
+            model_name = self.model if not self.model.startswith("models/") else self.model.replace("models/", "")
+
+            # 创建生成模型实例
+            model = genai.GenerativeModel(model_name)
+
+            # 生成响应
+            response = model.generate_content(
+                prompt,
+                generation_config=genai.types.GenerationConfig(
+                    max_output_tokens=self.max_tokens,
+                    temperature=self.temperature,
+                )
             )
 
             # 返回生成的文本
-            if response and response.result:
-                return response.result
+            if response and response.text:
+                return response.text
             else:
                 return "抱歉，无法生成响应。请重试。"
 
