@@ -48,35 +48,38 @@ def test_simple_request(genai):
         models_to_try = [
             "models/text-bison-001",
             "models/gemini-pro",
+            "models/gemini-2.5-flash",
+            "models/gemini-2.5-pro",
             "models/gemini-1.5-flash",
-            "text-bison-001",
-            "gemini-pro"
+            "models/gemini-1.5-pro"
         ]
-        
+
         for model in models_to_try:
             try:
                 print(f"尝试模型: {model}")
+
+                # 使用旧版API方式
                 response = genai.generate_text(
                     model=model,
                     prompt="Hello, how are you?",
                     max_output_tokens=50,
                     temperature=0.7
                 )
-                
+
                 if response and response.result:
                     print(f"✅ 模型 {model} 响应成功")
                     print(f"响应内容: {response.result[:100]}...")
                     return True, model
                 else:
                     print(f"⚠️ 模型 {model} 无响应")
-                    
+
             except Exception as e:
                 print(f"❌ 模型 {model} 失败: {str(e)[:100]}...")
                 continue
-        
+
         print("❌ 所有模型都失败了")
         return False, None
-        
+
     except Exception as e:
         print(f"❌ 请求测试失败: {e}")
         return False, None
