@@ -288,37 +288,83 @@ class NetworkTool(BaseTool):
     name = "network_tool"
     description = "执行真实的网络请求和测试"
     args_schema = NetworkInput
-    
+
     def _run(self, url: str, method: str = "GET") -> str:
         try:
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
             }
-            
+
             if method.upper() == "GET":
                 response = requests.get(url, headers=headers, timeout=10)
             elif method.upper() == "HEAD":
                 response = requests.head(url, headers=headers, timeout=10)
             else:
                 return f"不支持的HTTP方法: {method}"
-            
+
             result = []
             result.append(f"URL: {url}")
             result.append(f"状态码: {response.status_code}")
             result.append(f"响应时间: {response.elapsed.total_seconds():.2f}秒")
             result.append(f"内容长度: {len(response.content)} 字节")
             result.append(f"内容类型: {response.headers.get('content-type', '未知')}")
-            
+
             # 如果是HTML，提取标题
             if 'text/html' in response.headers.get('content-type', ''):
                 title_match = re.search(r'<title>(.*?)</title>', response.text, re.IGNORECASE)
                 if title_match:
                     result.append(f"页面标题: {title_match.group(1).strip()}")
-            
+
             return "\n".join(result)
-            
+
         except Exception as e:
             return f"网络请求失败: {str(e)}"
+
+
+# 获取当前时间工具
+class DateTimeInput(BaseModel):
+    format_type: Optional[str] = Field(default="full", description="时间格式类型: full(完整), date(仅日期), time(仅时间), timestamp(时间戳)")
+
+
+class DateTimeTool(BaseTool):
+    """获取当前时间和日期的工具"""
+    name = "get_current_time"
+    description = "获取当前的日期和时间，支持多种格式输出"
+    args_schema = DateTimeInput
+
+    def _run(self, format_type: str = "full") -> str:
+        try:
+            now = datetime.datetime.now()
+
+            if format_type == "full":
+                # 完整的日期时间格式
+                formatted_time = now.strftime("%Y年%m月%d日 %H:%M:%S")
+                weekday = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"][now.weekday()]
+                return f"当前时间: {formatted_time} {weekday}"
+
+            elif format_type == "date":
+                # 仅日期
+                return f"当前日期: {now.strftime('%Y年%m月%d日')}"
+
+            elif format_type == "time":
+                # 仅时间
+                return f"当前时间: {now.strftime('%H:%M:%S')}"
+
+            elif format_type == "timestamp":
+                # Unix时间戳
+                timestamp = int(now.timestamp())
+                return f"当前时间戳: {timestamp} (对应时间: {now.strftime('%Y-%m-%d %H:%M:%S')})"
+
+            elif format_type == "iso":
+                # ISO格式
+                return f"当前时间(ISO格式): {now.isoformat()}"
+
+            else:
+                # 默认格式
+                return f"当前时间: {now.strftime('%Y-%m-%d %H:%M:%S')}"
+
+        except Exception as e:
+            return f"获取时间失败: {str(e)}"
 
 
 def get_tools():
@@ -328,5 +374,6 @@ def get_tools():
         WebSearch(),
         FileOperations(),
         SystemInfo(),
-        NetworkTool()
+        NetworkTool(),
+        DateTimeTool()
     ]
