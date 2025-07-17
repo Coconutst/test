@@ -14,6 +14,7 @@ from typing import Any, Optional
 import requests
 from langchain.tools import BaseTool
 from pydantic import BaseModel, Field
+from config import Config
 
 
 # 计算器工具
@@ -46,134 +47,51 @@ class Calculator(BaseTool):
             return f"计算错误: {str(e)}"
 
 
-# 使用EXA-AI的网络搜索工具
+# 真实的网络搜索工具
 class SearchInput(BaseModel):
     query: str = Field(description="搜索关键词")
-    num_results: Optional[int] = Field(default=5, description="返回结果数量")
 
 
 class WebSearch(BaseTool):
-    """基于EXA-AI的高级网络搜索工具"""
+    """真实的网络搜索工具"""
     name = "web_search"
-    description = "使用EXA-AI进行高质量的互联网搜索，返回实时准确的结果"
+    description = "搜索互联网信息并返回真实结果"
     args_schema = SearchInput
     
-    def _run(self, query: str, num_results: int = 5) -> str:
+    def _run(self, query: str) -> str:
         try:
-            # EXA-AI搜索配置
-            exa_api_url = "https://api.exa.ai/search"
-
-            # 从环境变量获取EXA API密钥，如果没有则使用内置搜索
-            exa_api_key = os.getenv('EXA_API_KEY')
-
-            if exa_api_key:
-                # 使用EXA-AI API
-                headers = {
-                    'Authorization': f'Bearer {exa_api_key}',
-                    'Content-Type': 'application/json'
-                }
-
-                payload = {
-                    'query': query,
-                    'num_results': min(num_results, 10),
-                    'include_text': ['text']
-                }
-
-                try:
-                    response = requests.post(exa_api_url,
-                                           headers=headers,
-                                           json=payload,
-                                           timeout=15)
-
-                    if response.status_code == 200:
-                        data = response.json()
-                        results = []
-
-                        for i, result in enumerate(data.get('results', [])[:num_results], 1):
-                            title = result.get('title', '无标题')
-                            url = result.get('url', '')
-                            text = result.get('text', '')[:200] + '...' if result.get('text') else '无内容摘要'
-
-                            results.append(f"{i}. {title}\n   {url}\n   摘要: {text}\n")
-
-                        if results:
-                            return f"🔍 EXA-AI搜索 '{query}' 的结果:\n\n" + "\n".join(results)
-                        else:
-                            return f"EXA-AI搜索 '{query}' 没有找到相关结果"
-
-                    elif response.status_code == 401:
-                        return "EXA-AI API认证失败，请检查API密钥配置"
-                    else:
-                        print(f"EXA-AI API响应详情: {response.text}")  # 添加调试信息
-                        return f"EXA-AI API调用失败，状态码: {response.status_code}"
-
-                except requests.exceptions.RequestException as e:
-                    # 如果EXA-AI调用失败，回退到备用搜索方式
-                    return self._fallback_search(query)
-
-            else:
-                # 如果没有EXA API密钥，使用备用搜索方式
-                return self._fallback_search(query)
-
-        except Exception as e:
-            return f"搜索过程中发生错误: {str(e)}"
-
-    def _fallback_search(self, query: str) -> str:
-        """备用搜索方法"""
-        try:
-            # 使用模拟的高质量搜索结果
+            # 使用真实的搜索API
             encoded_query = urllib.parse.quote(query)
+            
+            # 尝试多个搜索源
+            search_engines = [
+                f"https://api.duckduckgo.com/?q={encoded_query}&format=json&no_html=1",
+                f"https://www.bing.com/search?q={encoded_query}&format=rss"
+            ]
             
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
             }
             
-            # 尝试DuckDuckGo即时答案API
-            try:
-                search_url = f"https://api.duckduckgo.com/?q={encoded_query}&format=json&no_html=1"
-                response = requests.get(search_url, headers=headers, timeout=10)
-
-                if response.status_code == 200:
-                    data = response.json()
-
-                    # 构建搜索结果
-                    results = []
-
-                    # 添加即时答案
-                    if data.get('AbstractText'):
-                        results.append(f"📊 即时答案: {data['AbstractText']}")
-                        if data.get('AbstractSource'):
-                            results.append(f"   来源: {data['AbstractSource']}")
-
-                    # 添加相关话题
-                    if data.get('RelatedTopics'):
-                        results.append("\n🔗 相关话题:")
-                        for i, topic in enumerate(data['RelatedTopics'][:3], 1):
-                            if isinstance(topic, dict) and topic.get('Text'):
-                                results.append(f"   {i}. {topic['Text'][:100]}...")
-
-                    # 添加定义
-                    if data.get('Definition'):
-                        results.append(f"\n📖 定义: {data['Definition']}")
-
-                    if results:
-                        return f"🔍 搜索 '{query}' 的结果:\n\n" + "\n".join(results)
-
-            except Exception:
-                pass
-
-            # 如果所有方法都失败，返回建议性回复
-            return f"""🔍 搜索 '{query}' 完成
-
-由于网络限制，无法获取实时搜索结果。建议您：
-1. 访问权威搜索引擎（Google、Bing、DuckDuckGo）
-2. 查看相关领域的官方网站或文档
-3. 咨询专业数据库或学术资源
-
-如需更准确的搜索功能，请配置EXA-AI API密钥。"""
-
+            for search_url in search_engines:
+                try:
+                    response = requests.get(search_url, headers=headers, timeout=10)
+                    if response.status_code == 200:
+                        if 'duckduckgo' in search_url:
+                            data = response.json()
+                            if data.get('AbstractText'):
+                                return f"搜索 '{query}' 的结果:\n{data['AbstractText']}\n来源: {data.get('AbstractSource', 'DuckDuckGo')}"
+                        else:
+                            # 简单解析HTML结果
+                            content = response.text[:1000]
+                            return f"搜索 '{query}' 完成\n找到相关信息，内容长度: {len(content)} 字符"
+                except:
+                    continue
+            
+            return f"搜索 '{query}' 完成，但由于网络限制无法获取详细结果"
+            
         except Exception as e:
-            return f"备用搜索失败: {str(e)}"
+            return f"搜索失败: {str(e)}"
 
 
 # 真实的文件操作工具
@@ -186,14 +104,24 @@ class FileInput(BaseModel):
 class FileOperations(BaseTool):
     """真实的文件操作工具"""
     name = "file_operations"
-    description = "执行真实的文件操作：读取、写入、列出、删除文件"
+    description = "执行真实的文件操作：读取、写入、列出、删除文件。所有操作都在安全工作区内进行。"
     args_schema = FileInput
     
     def _run(self, operation: str, path: str, content: str = None) -> str:
+        # --- 安全检查 ---
+        workspace_dir = os.path.abspath(Config.SAFE_WORKSPACE)
+        # 将用户提供的相对路径与工作区目录结合，并解析为绝对路径
+        target_path = os.path.abspath(os.path.join(workspace_dir, path))
+
+        # 验证目标路径是否在安全工作区内，防止路径遍历攻击 (e.g., "../../../etc/passwd")
+        if not target_path.startswith(workspace_dir):
+            return f"错误：禁止访问安全工作区之外的路径 '{path}'。"
+
         try:
+            # 现在所有操作都使用安全的 target_path
             if operation == "read":
-                if os.path.exists(path):
-                    with open(path, 'r', encoding='utf-8') as f:
+                if os.path.exists(target_path):
+                    with open(target_path, 'r', encoding='utf-8') as f:
                         file_content = f.read()
                     return f"文件 {path} 内容:\n{file_content[:500]}{'...' if len(file_content) > 500 else ''}"
                 else:
@@ -204,24 +132,25 @@ class FileOperations(BaseTool):
                     return "写入操作需要提供内容"
                 
                 # 确保目录存在
-                dir_path = os.path.dirname(path)
-                if dir_path:  # 只有当路径包含目录时才创建
-                    os.makedirs(dir_path, exist_ok=True)
+                dir_path = os.path.dirname(target_path)
+                os.makedirs(dir_path, exist_ok=True)
                 
-                with open(path, 'w', encoding='utf-8') as f:
+                with open(target_path, 'w', encoding='utf-8') as f:
                     f.write(content)
                 return f"成功写入文件 {path}，内容长度: {len(content)} 字符"
             
             elif operation == "list":
-                if os.path.isdir(path):
-                    files = os.listdir(path)
+                if not os.path.exists(target_path):
+                    return f"路径 {path} 不存在"
+                if os.path.isdir(target_path):
+                    files = os.listdir(target_path)
                     return f"目录 {path} 包含 {len(files)} 个项目:\n" + "\n".join(files[:20])
                 else:
                     return f"{path} 不是有效目录"
             
             elif operation == "delete":
-                if os.path.exists(path):
-                    os.remove(path)
+                if os.path.exists(target_path):
+                    os.remove(target_path)
                     return f"成功删除文件 {path}"
                 else:
                     return f"文件 {path} 不存在"
@@ -288,83 +217,37 @@ class NetworkTool(BaseTool):
     name = "network_tool"
     description = "执行真实的网络请求和测试"
     args_schema = NetworkInput
-
+    
     def _run(self, url: str, method: str = "GET") -> str:
         try:
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
             }
-
+            
             if method.upper() == "GET":
                 response = requests.get(url, headers=headers, timeout=10)
             elif method.upper() == "HEAD":
                 response = requests.head(url, headers=headers, timeout=10)
             else:
                 return f"不支持的HTTP方法: {method}"
-
+            
             result = []
             result.append(f"URL: {url}")
             result.append(f"状态码: {response.status_code}")
             result.append(f"响应时间: {response.elapsed.total_seconds():.2f}秒")
             result.append(f"内容长度: {len(response.content)} 字节")
             result.append(f"内容类型: {response.headers.get('content-type', '未知')}")
-
+            
             # 如果是HTML，提取标题
             if 'text/html' in response.headers.get('content-type', ''):
                 title_match = re.search(r'<title>(.*?)</title>', response.text, re.IGNORECASE)
                 if title_match:
                     result.append(f"页面标题: {title_match.group(1).strip()}")
-
+            
             return "\n".join(result)
-
+            
         except Exception as e:
             return f"网络请求失败: {str(e)}"
-
-
-# 获取当前时间工具
-class DateTimeInput(BaseModel):
-    format_type: Optional[str] = Field(default="full", description="时间格式类型: full(完整), date(仅日期), time(仅时间), timestamp(时间戳)")
-
-
-class DateTimeTool(BaseTool):
-    """获取当前时间和日期的工具"""
-    name = "get_current_time"
-    description = "获取当前的日期和时间，支持多种格式输出"
-    args_schema = DateTimeInput
-
-    def _run(self, format_type: str = "full") -> str:
-        try:
-            now = datetime.datetime.now()
-
-            if format_type == "full":
-                # 完整的日期时间格式
-                formatted_time = now.strftime("%Y年%m月%d日 %H:%M:%S")
-                weekday = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"][now.weekday()]
-                return f"当前时间: {formatted_time} {weekday}"
-
-            elif format_type == "date":
-                # 仅日期
-                return f"当前日期: {now.strftime('%Y年%m月%d日')}"
-
-            elif format_type == "time":
-                # 仅时间
-                return f"当前时间: {now.strftime('%H:%M:%S')}"
-
-            elif format_type == "timestamp":
-                # Unix时间戳
-                timestamp = int(now.timestamp())
-                return f"当前时间戳: {timestamp} (对应时间: {now.strftime('%Y-%m-%d %H:%M:%S')})"
-
-            elif format_type == "iso":
-                # ISO格式
-                return f"当前时间(ISO格式): {now.isoformat()}"
-
-            else:
-                # 默认格式
-                return f"当前时间: {now.strftime('%Y-%m-%d %H:%M:%S')}"
-
-        except Exception as e:
-            return f"获取时间失败: {str(e)}"
 
 
 def get_tools():
@@ -374,6 +257,5 @@ def get_tools():
         WebSearch(),
         FileOperations(),
         SystemInfo(),
-        NetworkTool(),
-        DateTimeTool()
+        NetworkTool()
     ]

@@ -116,6 +116,12 @@ Final Answer: 抱歉，我目前在模拟模式下运行。要使用真实的Gem
         """生成智能的回退响应"""
         import datetime
         import re
+        import platform
+        try:
+            from importlib import metadata
+        except ImportError:
+            # 兼容 Python < 3.8
+            import importlib_metadata as metadata
 
         # 分析用户输入，提供相应的回答
         prompt_lower = prompt.lower()
@@ -173,21 +179,26 @@ Final Answer: 我可以帮您进行基本的数学计算，但目前处于临时
 
         # 默认响应
         else:
+            try:
+                gg_version = metadata.version('google-generativeai')
+            except metadata.PackageNotFoundError:
+                gg_version = "未安装"
+            python_version = platform.python_version()
+
             return f"""Thought: 用户提出了问题，但我目前处于临时响应模式。
 Final Answer: 感谢您的问题。我目前处于临时响应模式，因为Gemini API暂时不可用。
 
 您的问题是：{prompt[:100]}{'...' if len(prompt) > 100 else ''}
 
 🔧 技术状态：
-- 当前Python版本：3.8.8
-- 需要Python版本：3.9+
-- google-generativeai版本：0.1.0rc1（旧版本）
-- 问题：旧版本API不支持现代Gemini模型
+- 当前Python版本：{python_version}
+- google-generativeai版本：{gg_version}
+- 问题：API可能因为网络、版本或密钥问题不可用。
 
 💡 建议解决方案：
-1. 升级Python环境到3.9+
-2. 安装最新版本的google-generativeai库
-3. 检查网络连接和代理设置
+1. 检查您的 `GEMINI_API_KEY` 是否正确配置。
+2. 确保您的Python环境可以访问Google API（检查代理或网络设置）。
+3. 尝试更新库: `pip install --upgrade google-generativeai`
 
 在解决这些问题之前，我只能提供基本的响应。"""
 

@@ -29,13 +29,13 @@ class Config:
     MAX_TOKENS = 20000
     TEMPERATURE = 0.7
 
-    # Agent配置
-    MAX_ITERATIONS = 10
-    VERBOSE = True
-
     # --- Agent配置 ---
     MAX_ITERATIONS = 10
     VERBOSE = True
+
+    # --- 文件操作安全配置 ---
+    # 将所有文件操作限制在此目录下，防止访问项目外文件
+    SAFE_WORKSPACE = "workspace"
 
     @classmethod
     def validate(cls):
@@ -59,7 +59,14 @@ class Config:
         if cls.PROXY_URL:
             print(f"✅ 网络代理已配置: {cls.PROXY_URL}")
         else:
-            print("ℹ️  提示: 未配置网络代理，将直接进行网络连接")
+            print("ℹ️  提示: 未配置网络连接，将直接进行网络连接")
+
+        # 确保安全工作区存在
+        if not os.path.exists(cls.SAFE_WORKSPACE):
+            os.makedirs(cls.SAFE_WORKSPACE)
+            print(f"✅ 安全工作区 '{cls.SAFE_WORKSPACE}' 已创建")
+        else:
+            print(f"✅ 安全工作区 '{cls.SAFE_WORKSPACE}' 已加载")
 
         print("--------------------------")
         return True
