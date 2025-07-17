@@ -1,0 +1,234 @@
+🔍 检查可用的Gemini模型...
+==================================================
+✅ 可用模型列表:
+  - models/embedding-gecko-001
+    描述: Embedding Gecko
+    支持的方法: ['embedText', 'countTextTokens']
+
+  - models/gemini-1.0-pro-vision-latest
+    描述: Gemini 1.0 Pro Vision
+    支持的方法: ['generateContent', 'countTokens']
+
+  - models/gemini-pro-vision
+    描述: Gemini 1.0 Pro Vision
+    支持的方法: ['generateContent', 'countTokens']
+
+  - models/gemini-1.5-pro-latest
+    描述: Gemini 1.5 Pro Latest
+    支持的方法: ['generateContent', 'countTokens']
+
+  - models/gemini-1.5-pro-002
+    描述: Gemini 1.5 Pro 002
+    支持的方法: ['generateContent', 'countTokens', 'createCachedContent']
+
+  - models/gemini-1.5-pro
+    描述: Gemini 1.5 Pro
+    支持的方法: ['generateContent', 'countTokens']
+
+  - models/gemini-1.5-flash-latest
+    描述: Gemini 1.5 Flash Latest
+    支持的方法: ['generateContent', 'countTokens']
+
+  - models/gemini-1.5-flash
+    描述: Gemini 1.5 Flash
+    支持的方法: ['generateContent', 'countTokens']
+
+  - models/gemini-1.5-flash-002
+    描述: Gemini 1.5 Flash 002
+    支持的方法: ['generateContent', 'countTokens', 'createCachedContent']
+
+  - models/gemini-1.5-flash-8b
+    描述: Gemini 1.5 Flash-8B
+    支持的方法: ['createCachedContent', 'generateContent', 'countTokens']
+
+  - models/gemini-1.5-flash-8b-001
+    描述: Gemini 1.5 Flash-8B 001
+    支持的方法: ['createCachedContent', 'generateContent', 'countTokens']
+
+  - models/gemini-1.5-flash-8b-latest
+    描述: Gemini 1.5 Flash-8B Latest
+    支持的方法: ['createCachedContent', 'generateContent', 'countTokens']
+
+  - models/gemini-2.5-pro-preview-03-25
+    描述: Gemini 2.5 Pro Preview 03-25
+    支持的方法: ['generateContent', 'countTokens', 'createCachedContent', 'batchGenerateContent']
+
+  - models/gemini-2.5-flash-preview-05-20
+    描述: Gemini 2.5 Flash Preview 05-20
+    支持的方法: ['generateContent', 'countTokens', 'createCachedContent', 'batchGenerateContent']
+
+  - models/gemini-2.5-flash
+    描述: Gemini 2.5 Flash
+    支持的方法: ['generateContent', 'countTokens', 'createCachedContent', 'batchGenerateContent']
+
+  - models/gemini-2.5-flash-lite-preview-06-17
+    描述: Gemini 2.5 Flash-Lite Preview 06-17
+    支持的方法: ['generateContent', 'countTokens', 'createCachedContent', 'batchGenerateContent']
+
+  - models/gemini-2.5-pro-preview-05-06
+    描述: Gemini 2.5 Pro Preview 05-06
+    支持的方法: ['generateContent', 'countTokens', 'createCachedContent', 'batchGenerateContent']
+
+  - models/gemini-2.5-pro-preview-06-05
+    描述: Gemini 2.5 Pro Preview
+    支持的方法: ['generateContent', 'countTokens', 'createCachedContent', 'batchGenerateContent']
+
+  - models/gemini-2.5-pro
+    描述: Gemini 2.5 Pro
+    支持的方法: ['generateContent', 'countTokens', 'createCachedContent', 'batchGenerateContent']
+
+  - models/gemini-2.0-flash-exp
+    描述: Gemini 2.0 Flash Experimental
+    支持的方法: ['generateContent', 'countTokens', 'bidiGenerateContent']
+
+  - models/gemini-2.0-flash
+    描述: Gemini 2.0 Flash
+    支持的方法: ['generateContent', 'countTokens', 'createCachedContent', 'batchGenerateContent']
+
+  - models/gemini-2.0-flash-001
+    描述: Gemini 2.0 Flash 001
+    支持的方法: ['generateContent', 'countTokens', 'createCachedContent', 'batchGenerateContent']
+
+  - models/gemini-2.0-flash-exp-image-generation
+    描述: Gemini 2.0 Flash (Image Generation) Experimental
+    支持的方法: ['generateContent', 'countTokens', 'bidiGenerateContent']
+
+  - models/gemini-2.0-flash-lite-001
+    描述: Gemini 2.0 Flash-Lite 001
+    支持的方法: ['generateContent', 'countTokens', 'createCachedContent', 'batchGenerateContent']
+
+  - models/gemini-2.0-flash-lite
+    描述: Gemini 2.0 Flash-Lite
+    支持的方法: ['generateContent', 'countTokens', 'createCachedContent', 'batchGenerateContent']
+
+  - models/gemini-2.0-flash-preview-image-generation
+    描述: Gemini 2.0 Flash Preview Image Generation
+    支持的方法: ['generateContent', 'countTokens']
+
+  - models/gemini-2.0-flash-lite-preview-02-05
+    描述: Gemini 2.0 Flash-Lite Preview 02-05
+    支持的方法: ['generateContent', 'countTokens', 'createCachedContent', 'batchGenerateContent']
+
+  - models/gemini-2.0-flash-lite-preview
+    描述: Gemini 2.0 Flash-Lite Preview
+    支持的方法: ['generateContent', 'countTokens', 'createCachedContent', 'batchGenerateContent']
+
+  - models/gemini-2.0-pro-exp
+    描述: Gemini 2.0 Pro Experimental
+    支持的方法: ['generateContent', 'countTokens', 'createCachedContent', 'batchGenerateContent']
+
+  - models/gemini-2.0-pro-exp-02-05
+    描述: Gemini 2.0 Pro Experimental 02-05
+    支持的方法: ['generateContent', 'countTokens', 'createCachedContent', 'batchGenerateContent']
+
+  - models/gemini-exp-1206
+    描述: Gemini Experimental 1206
+    支持的方法: ['generateContent', 'countTokens', 'createCachedContent', 'batchGenerateContent']
+
+  - models/gemini-2.0-flash-thinking-exp-01-21
+    描述: Gemini 2.5 Flash Preview 05-20
+    支持的方法: ['generateContent', 'countTokens', 'createCachedContent', 'batchGenerateContent']
+
+  - models/gemini-2.0-flash-thinking-exp
+    描述: Gemini 2.5 Flash Preview 05-20
+    支持的方法: ['generateContent', 'countTokens', 'createCachedContent', 'batchGenerateContent']
+
+  - models/gemini-2.0-flash-thinking-exp-1219
+    描述: Gemini 2.5 Flash Preview 05-20
+    支持的方法: ['generateContent', 'countTokens', 'createCachedContent', 'batchGenerateContent']
+
+  - models/gemini-2.5-flash-preview-tts
+    描述: Gemini 2.5 Flash Preview TTS
+    支持的方法: ['countTokens', 'generateContent']
+
+  - models/gemini-2.5-pro-preview-tts
+    描述: Gemini 2.5 Pro Preview TTS
+    支持的方法: ['countTokens', 'generateContent']
+
+  - models/learnlm-2.0-flash-experimental
+    描述: LearnLM 2.0 Flash Experimental
+    支持的方法: ['generateContent', 'countTokens']
+
+  - models/gemma-3-1b-it
+    描述: Gemma 3 1B
+    支持的方法: ['generateContent', 'countTokens']
+
+  - models/gemma-3-4b-it
+    描述: Gemma 3 4B
+    支持的方法: ['generateContent', 'countTokens']
+
+  - models/gemma-3-12b-it
+    描述: Gemma 3 12B
+    支持的方法: ['generateContent', 'countTokens']
+
+  - models/gemma-3-27b-it
+    描述: Gemma 3 27B
+    支持的方法: ['generateContent', 'countTokens']
+
+  - models/gemma-3n-e4b-it
+    描述: Gemma 3n E4B
+    支持的方法: ['generateContent', 'countTokens']
+
+  - models/gemma-3n-e2b-it
+    描述: Gemma 3n E2B
+    支持的方法: ['generateContent', 'countTokens']
+
+  - models/embedding-001
+    描述: Embedding 001
+    支持的方法: ['embedContent']
+
+  - models/text-embedding-004
+    描述: Text Embedding 004
+    支持的方法: ['embedContent']
+
+  - models/gemini-embedding-exp-03-07
+    描述: Gemini Embedding Experimental 03-07
+    支持的方法: ['embedContent', 'countTextTokens', 'countTokens']
+
+  - models/gemini-embedding-exp
+    描述: Gemini Embedding Experimental
+    支持的方法: ['embedContent', 'countTextTokens', 'countTokens']
+
+  - models/gemini-embedding-001
+    描述: Gemini Embedding 001
+    支持的方法: ['embedContent', 'countTextTokens', 'countTokens']
+
+  - models/aqa
+    描述: Model that performs Attributed Question Answering.
+    支持的方法: ['generateAnswer']
+
+  - models/imagen-3.0-generate-002
+    描述: Imagen 3.0 002 model
+    支持的方法: ['predict']
+
+  - models/imagen-4.0-generate-preview-06-06
+    描述: Imagen 4 (Preview)
+    支持的方法: ['predict']
+
+  - models/imagen-4.0-ultra-generate-preview-06-06
+    描述: Imagen 4 Ultra (Preview)
+    支持的方法: ['predict']
+
+  - models/veo-2.0-generate-001
+    描述: Veo 2
+    支持的方法: ['predictLongRunning']
+
+  - models/gemini-2.5-flash-preview-native-audio-dialog
+    描述: Gemini 2.5 Flash Preview Native Audio Dialog
+    支持的方法: ['countTokens', 'bidiGenerateContent']
+
+  - models/gemini-2.5-flash-exp-native-audio-thinking-dialog
+    描述: Gemini 2.5 Flash Exp Native Audio Thinking Dialog
+    支持的方法: ['countTokens', 'bidiGenerateContent']
+
+  - models/gemini-2.0-flash-live-001
+    描述: Gemini 2.0 Flash 001
+    支持的方法: ['bidiGenerateContent', 'countTokens']
+
+  - models/gemini-live-2.5-flash-preview
+    描述: Gemini Live 2.5 Flash Preview
+    支持的方法: ['bidiGenerateContent', 'countTokens']
+
+  - models/gemini-2.5-flash-live-preview
+    描述: Gemini 2.5 Flash Live Preview
+    支持的方法: ['bidiGenerateContent', 'countTokens']
