@@ -259,7 +259,7 @@ class SystemInfo(BaseTool):
 
                 # 如果只要日期，直接返回
                 if info_type in ["date", "current_date"]:
-                    return f"今天是{now.strftime('%Y年%m月%d日')} {weekday}"
+                    return f"[实时查询] 今天是{now.strftime('%Y年%m月%d日')} {weekday}"
 
                 # 如果要日期时间，返回完整信息
                 if info_type == "current_datetime":
