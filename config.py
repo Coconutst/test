@@ -24,8 +24,8 @@ class Config:
     PROXY_URL = os.getenv("HTTP_PROXY", os.getenv("HTTPS_PROXY", ""))
 
     # 模型配置
-    DEFAULT_MODEL = "gemini-2.5-flash-preview-04-17"
-    ALTERNATIVE_MODELS = ["gemini-2.5-flash", "gemini-2.5-pro","gemini-2.5-flash-preview-04-17"]
+    DEFAULT_MODEL = "gemini-2.5-flash"
+    ALTERNATIVE_MODELS = ["gemini-2.5-flash-preview-05-20", "gemini-2.5-pro","gemini-2.5-flash-preview-04-17"]
     MAX_TOKENS = 20000
     TEMPERATURE = 0.7
 

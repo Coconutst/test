@@ -234,42 +234,73 @@ class FileOperations(BaseTool):
 
 
 # 真实的系统信息工具
+class SystemInfoInput(BaseModel):
+    info_type: str = Field(default="all", description="信息类型: all(全部), date(日期), current_date(当前日期), current_datetime(当前日期时间), system(系统), network(网络), disk(磁盘)")
+
+
 class SystemInfo(BaseTool):
     """真实的系统信息工具"""
     name = "system_info"
-    description = "获取真实的系统信息"
-    
-    def _run(self, info_type: str = "all") -> str:
+    description = "获取系统信息和当前日期时间。支持参数：date(获取今天日期)、current_date(获取今天日期)、current_datetime(获取当前日期时间)、all(获取所有系统信息)"
+    args_schema = SystemInfoInput
+
+    def _run(self, info_type: str = "all", **kwargs) -> str:
         try:
+            # 处理可能的参数别名
+            if 'query' in kwargs:
+                info_type = kwargs['query']
+
             info = []
-            
+
+            # 当前日期时间信息
+            if info_type in ["all", "date", "current_date", "current_datetime"]:
+                now = datetime.datetime.now()
+                weekday = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"][now.weekday()]
+
+                # 如果只要日期，直接返回
+                if info_type in ["date", "current_date"]:
+                    return f"今天是{now.strftime('%Y年%m月%d日')} {weekday}"
+
+                # 如果要日期时间，返回完整信息
+                if info_type == "current_datetime":
+                    return f"当前日期时间: {now.strftime('%Y年%m月%d日 %H:%M:%S')} {weekday}"
+
+                # 如果是all，添加到info列表
+                info.append(f"当前日期: {now.strftime('%Y年%m月%d日')}")
+                info.append(f"当前时间: {now.strftime('%H:%M:%S')}")
+                info.append(f"星期: {weekday}")
+
             # 基本系统信息
-            info.append(f"操作系统: {platform.system()} {platform.release()}")
-            info.append(f"计算机名: {platform.node()}")
-            info.append(f"处理器架构: {platform.machine()}")
-            info.append(f"处理器: {platform.processor()}")
-            info.append(f"Python版本: {platform.python_version()}")
-            
+            if info_type in ["all", "system"]:
+                info.append(f"操作系统: {platform.system()} {platform.release()}")
+                info.append(f"计算机名: {platform.node()}")
+                info.append(f"处理器架构: {platform.machine()}")
+                info.append(f"处理器: {platform.processor()}")
+                info.append(f"Python版本: {platform.python_version()}")
+
             # 网络信息
-            try:
-                hostname = socket.gethostname()
-                local_ip = socket.gethostbyname(hostname)
-                info.append(f"本机IP: {local_ip}")
-            except:
-                info.append("本机IP: 获取失败")
-            
+            if info_type in ["all", "network"]:
+                try:
+                    hostname = socket.gethostname()
+                    local_ip = socket.gethostbyname(hostname)
+                    info.append(f"本机IP: {local_ip}")
+                except:
+                    info.append("本机IP: 获取失败")
+
             # 磁盘信息
-            try:
-                if platform.system() == "Windows":
-                    import shutil
-                    total, used, free = shutil.disk_usage("C:")
-                    info.append(f"C盘空间: 总计 {total//1024**3}GB, 已用 {used//1024**3}GB, 可用 {free//1024**3}GB")
-            except:
-                info.append("磁盘信息: 获取失败")
-            
+            if info_type in ["all", "disk"]:
+                try:
+                    if platform.system() == "Windows":
+                        import shutil
+                        total, used, free = shutil.disk_usage("C:")
+                        info.append(f"C盘空间: 总计 {total//1024**3}GB, 已用 {used//1024**3}GB, 可用 {free//1024**3}GB")
+                except:
+                    info.append("磁盘信息: 获取失败")
+
             # 环境变量
-            info.append(f"用户目录: {os.path.expanduser('~')}")
-            info.append(f"当前工作目录: {os.getcwd()}")
+            if info_type in ["all"]:
+                info.append(f"用户目录: {os.path.expanduser('~')}")
+                info.append(f"当前工作目录: {os.getcwd()}")
             
             return "系统信息:\n" + "\n".join(info)
             
@@ -332,8 +363,12 @@ class DateTimeTool(BaseTool):
     description = "获取当前的日期和时间，支持多种格式输出"
     args_schema = DateTimeInput
 
-    def _run(self, format_type: str = "full") -> str:
+    def _run(self, format_type: str = "full", **kwargs) -> str:
         try:
+            # 处理可能的参数别名
+            if 'format' in kwargs:
+                format_type = kwargs['format']
+
             now = datetime.datetime.now()
 
             if format_type == "full":
@@ -359,6 +394,10 @@ class DateTimeTool(BaseTool):
                 # ISO格式
                 return f"当前时间(ISO格式): {now.isoformat()}"
 
+            elif format_type in ["YYYY年MM月DD日", "YYYY-MM-DD"]:
+                # 特定日期格式
+                return f"{now.strftime('%Y-%m-%d')}"
+
             else:
                 # 默认格式
                 return f"当前时间: {now.strftime('%Y-%m-%d %H:%M:%S')}"
@@ -374,6 +413,5 @@ def get_tools():
         WebSearch(),
         FileOperations(),
         SystemInfo(),
-        NetworkTool(),
-        DateTimeTool()
+        NetworkTool()
     ]
